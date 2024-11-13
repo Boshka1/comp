@@ -1,0 +1,71 @@
+#include <iostream>
+#include <fstream>
+#include <chrono>
+#include <thread>
+#include <string>
+#include <windows.h>
+
+using namespace std;
+
+int main()
+{
+    setlocale(LC_ALL, "Russian");
+    SetConsoleOutputCP(1251);
+    SetConsoleCP(1251);
+    ifstream request;
+    ofstream response;
+    int size_1 = 0, size_2 = 0, kol = 0, grade;
+    string name;
+
+    request.open("D:/dz/request.txt");
+    request.seekg(0, ios::end);
+    size_2 = request.tellg();
+    size_1 = size_2;
+    request.close();
+    cout << "Сервер запущен" << endl;
+    while (true)
+    {
+        request.open("D:/dz/request.txt");
+        request.seekg(0, ios::end);
+        size_2 = request.tellg();
+
+        if (size_1 != size_2)
+        {
+            request.seekg(size_1, ios::beg);
+            getline(request, name);
+            cout << "работа с : " << name << endl;// Получаем имя клиента
+            request >> kol;
+
+            int* grades = new int[kol];
+            bool hasLowGrade = false;
+
+            for (int i = 0; i < kol; i++) {
+                request >> grades[i];
+                cout << grades[i] << endl;
+            }
+            cout << endl;
+            for (int i = 0; i < kol; i++) {
+                cout << grades[i] << endl;
+                if (grades[i] < 4) {
+                    hasLowGrade = true;
+                    break;
+                }
+            }
+            response.open("D:/dz/response.txt", ios::app);
+            cout << "end" << endl;
+            if (hasLowGrade) {
+                response << "Бюджет слетает" << endl;
+            }
+            else {
+                response << "Бюджет остается" << endl;
+            }
+            response.close();
+
+            delete[] grades;
+            size_1 = size_2;
+        }
+
+        request.close();
+        this_thread::sleep_for(chrono::milliseconds(500));
+    }
+}
